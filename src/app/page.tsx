@@ -8,7 +8,7 @@ import { useOrders } from "@/hooks/use-orders";
 import { useEffect, useState } from "react";
 
 export default function Dashboard() {
-  const { orders, newCount } = useOrders();
+  const { orders, newCount, updateStatus } = useOrders();
   const [clock, setClock] = useState("");
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function Dashboard() {
           </TabsList>
 
           <TabsContent value="orders" className="mt-0 p-6">
-            <OrdersTab orders={orders} />
+            <OrdersTab orders={orders} updateStatus={updateStatus} />
           </TabsContent>
           <TabsContent value="menu" className="mt-0 p-6">
             <MenuTab />

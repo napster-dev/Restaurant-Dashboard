@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import type { Order } from "@/hooks/use-orders";
-import { useOrders } from "@/hooks/use-orders";
 import { useState, useEffect } from "react";
 
 const STATUS_CONFIG = {
@@ -58,10 +57,10 @@ function getTimeAgo(createdAt: string, currentTime: number) {
 
 interface OrdersTabProps {
   orders: Order[];
+  updateStatus: (id: string, status: string) => Promise<void>;
 }
 
-export function OrdersTab({ orders }: OrdersTabProps) {
-  const { updateStatus } = useOrders();
+export function OrdersTab({ orders, updateStatus }: OrdersTabProps) {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [tick, setTick] = useState(() => Date.now());
 
@@ -141,9 +140,8 @@ export function OrdersTab({ orders }: OrdersTabProps) {
                 {colOrders.map((order) => (
                   <Card
                     key={order.id}
-                    className={`cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg bg-card/50 ${config.cardBorder} ${
-                      order.status === "new" ? "animate-in slide-in-from-top-2 duration-500" : ""
-                    }`}
+                    className={`cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg bg-card/50 ${config.cardBorder} ${order.status === "new" ? "animate-in slide-in-from-top-2 duration-500" : ""
+                      }`}
                     onClick={() => setSelectedOrder(order)}
                   >
                     <CardContent className="p-3.5">
