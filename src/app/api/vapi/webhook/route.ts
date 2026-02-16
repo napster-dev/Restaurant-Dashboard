@@ -20,8 +20,9 @@ export async function POST(request: Request) {
         // Handle VAPI tool-calls message type
         if (message && message.type === 'tool-calls') {
             const results: { name: string; toolCallId: string; result: string }[] = [];
+            const toolCallList = message.toolCallList || message.toolCalls || message.tool_calls || [];
 
-            for (const toolCall of message.toolCallList || []) {
+            for (const toolCall of toolCallList) {
                 const functionName = toolCall.function?.name || toolCall.name;
                 let params = toolCall.function?.arguments || toolCall.parameters || {};
 

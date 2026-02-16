@@ -40,7 +40,10 @@ export function useOrders() {
     const fetchOrders = useCallback(async () => {
         try {
             const res = await fetch("/api/orders");
-            const data = await res.json();
+            const data = (await res.json()).map((o: Order) => ({
+                ...o,
+                status: (o.status || 'new').toLowerCase()
+            }));
             setOrders(data);
             setNewCount(data.filter((o: Order) => o.status === "new").length);
         } catch (err) {
@@ -116,15 +119,18 @@ export function useOrders() {
                             customerAddress: payload.new.customer_address,
                             items: payload.new.items,
                             specialInstructions: payload.new.special_instructions,
-                            status: payload.new.status as Order['status'],
+                            status: (payload.new.status || 'new').toLowerCase() as Order['status'],
                             createdAt: payload.new.created_at,
                             updatedAt: payload.new.updated_at
                         };
-                        setOrders((prev) => [newOrder, ...prev]);
-                        setNewCount((c) => c + 1);
+                        setOrders((prev) => {
+                            const updatedOrders = [newOrder, ...prev];
+                            setNewCount(updatedOrders.filter(o => o.status === 'new').length);
+                            return updatedOrders;
+                        });
                         playNotification();
-                        toast.info("🔔 New Order!", {
-                            description: `${newOrder.customerName} — ${newOrder.items.map((i) => `${i.quantity}x ${i.name}`).join(", ")}`,
+                        toast.info(`🔔 New ${newOrder.customerAddress.toLowerCase().includes('pickup') ? 'Pickup' : 'Order'}!`, {
+                            description: `${newOrder.customerName}: ${newOrder.items.map((i) => `${i.quantity}x ${i.name}${i.notes ? ` (${i.notes})` : ''}`).join(", ")}`,
                             duration: 8000,
                         });
                     } else if (payload.eventType === 'UPDATE' && payload.new) {
@@ -135,7 +141,7 @@ export function useOrders() {
                             customerAddress: payload.new.customer_address,
                             items: payload.new.items,
                             specialInstructions: payload.new.special_instructions,
-                            status: payload.new.status as Order['status'],
+                            status: (payload.new.status || 'new').toLowerCase() as Order['status'],
                             createdAt: payload.new.created_at,
                             updatedAt: payload.new.updated_at
                         };

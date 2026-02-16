@@ -60,7 +60,7 @@ export async function getOrders(): Promise<Order[]> {
         customerAddress: o.customer_address,
         items: o.items as OrderItem[],
         specialInstructions: o.special_instructions,
-        status: o.status as Order['status'],
+        status: (o.status || 'new').toLowerCase() as Order['status'],
         createdAt: o.created_at,
         updatedAt: o.updated_at
     }));
@@ -85,7 +85,7 @@ export async function getOrderById(id: string): Promise<Order | null> {
         customerAddress: data.customer_address,
         items: data.items as OrderItem[],
         specialInstructions: data.special_instructions,
-        status: data.status as Order['status'],
+        status: (data.status || 'new').toLowerCase() as Order['status'],
         createdAt: data.created_at,
         updatedAt: data.updated_at
     };

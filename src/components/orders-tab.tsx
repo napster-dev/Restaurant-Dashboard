@@ -140,15 +140,22 @@ export function OrdersTab({ orders, updateStatus }: OrdersTabProps) {
                 {colOrders.map((order) => (
                   <Card
                     key={order.id}
-                    className={`cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg bg-card/50 ${config.cardBorder} ${order.status === "new" ? "animate-in slide-in-from-top-2 duration-500" : ""
+                    className={`cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg bg-card/50 ${config.cardBorder} ${order.status.toLowerCase() === "new" ? "animate-in slide-in-from-top-2 duration-500" : ""
                       }`}
                     onClick={() => setSelectedOrder(order)}
                   >
                     <CardContent className="p-3.5">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-mono text-muted-foreground">
-                          #{order.id.slice(-6)}
-                        </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[10px] font-mono text-muted-foreground">
+                            #{order.id.slice(-6)}
+                          </span>
+                          {order.customerAddress.toLowerCase().includes('pickup') && (
+                            <Badge variant="outline" className="text-[9px] h-4 px-1 py-0 border-amber-500/30 text-amber-500 bg-amber-500/5 font-bold uppercase tracking-tighter">
+                              Pickup
+                            </Badge>
+                          )}
+                        </div>
                         <span className="text-[10px] text-muted-foreground">
                           {getTimeAgo(order.createdAt, tick)}
                         </span>
@@ -158,12 +165,12 @@ export function OrdersTab({ orders, updateStatus }: OrdersTabProps) {
                       </p>
                       <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
                         {order.items
-                          .map((i) => `${i.quantity}x ${i.name}`)
+                          .map((i) => `${i.quantity}x ${i.name}${i.notes ? ` (${i.notes})` : ''}`)
                           .join(", ")}
                       </p>
 
                       {/* Quick Actions */}
-                      {order.status === "new" && (
+                      {order.status.toLowerCase() === "new" && (
                         <div className="flex gap-1.5">
                           <Button
                             size="sm"
@@ -277,7 +284,7 @@ export function OrdersTab({ orders, updateStatus }: OrdersTabProps) {
 
                 {/* Actions */}
                 <div className="flex gap-2 pt-1">
-                  {selectedOrder.status === "new" && (
+                  {selectedOrder.status.toLowerCase() === "new" && (
                     <>
                       <Button
                         className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white"
