@@ -22,9 +22,20 @@ export async function POST(request: Request) {
             const results: { name: string; toolCallId: string; result: string }[] = [];
 
             for (const toolCall of message.toolCallList || []) {
-                if (toolCall.name === 'submit_order') {
-                    const params = toolCall.parameters || {};
+                const functionName = toolCall.function?.name || toolCall.name;
+                let params = toolCall.function?.arguments || toolCall.parameters || {};
 
+                // OpenAI format sends arguments as a stringified JSON
+                if (typeof params === 'string') {
+                    try {
+                        params = JSON.parse(params);
+                    } catch (e) {
+                        console.error('Failed to parse tool arguments:', e);
+                        params = {};
+                    }
+                }
+
+                if (functionName === 'submit_order') {
                     const order: Order = {
                         id: uid('ord_'),
                         customerName: params.customerName || 'Unknown Customer',
@@ -40,7 +51,7 @@ export async function POST(request: Request) {
                     await saveOrder(order);
 
                     results.push({
-                        name: 'submit_order',
+                        name: functionName,
                         toolCallId: toolCall.id,
                         result: JSON.stringify({
                             success: true,
@@ -50,9 +61,9 @@ export async function POST(request: Request) {
                     });
                 } else {
                     results.push({
-                        name: toolCall.name,
+                        name: functionName,
                         toolCallId: toolCall.id,
-                        result: JSON.stringify({ error: 'Unknown tool' }),
+                        result: JSON.stringify({ error: 'Unknown tool', receivedName: functionName }),
                     });
                 }
             }
