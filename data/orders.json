@@ -1,0 +1,22 @@
+[
+  {
+    "id": "ord_mlpffvv1p6ad59",
+    "customerName": "Test Customer",
+    "customerPhone": "555-1234",
+    "customerAddress": "123 Main St",
+    "items": [
+      {
+        "name": "Burger",
+        "quantity": 2
+      },
+      {
+        "name": "Fries",
+        "quantity": 1
+      }
+    ],
+    "specialInstructions": "Extra ketchup",
+    "status": "new",
+    "createdAt": "2026-02-16T17:07:08.941Z",
+    "updatedAt": "2026-02-16T17:07:08.941Z"
+  }
+]
