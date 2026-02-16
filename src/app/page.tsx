@@ -5,10 +5,13 @@ import { OrdersTab } from "@/components/orders-tab";
 import { MenuTab } from "@/components/menu-tab";
 import { SettingsTab } from "@/components/settings-tab";
 import { useOrders } from "@/hooks/use-orders";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
-export default function Dashboard() {
+function DashboardContent() {
   const { orders, newCount, updateStatus } = useOrders();
+  const searchParams = useSearchParams();
+  const showVapi = searchParams.get("vapi") === "true";
   const [clock, setClock] = useState("");
 
   useEffect(() => {
@@ -67,9 +70,11 @@ export default function Dashboard() {
             <TabsTrigger value="menu" className="gap-2 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-500 rounded-none">
               <span>📖</span> Menu
             </TabsTrigger>
-            <TabsTrigger value="settings" className="gap-2 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-500 rounded-none">
-              <span>⚙️</span> VAPI Settings
-            </TabsTrigger>
+            {showVapi && (
+              <TabsTrigger value="settings" className="gap-2 data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:border-b-2 data-[state=active]:border-indigo-500 rounded-none">
+                <span>⚙️</span> VAPI Settings
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="orders" className="mt-0 p-6">
@@ -78,11 +83,25 @@ export default function Dashboard() {
           <TabsContent value="menu" className="mt-0 p-6">
             <MenuTab />
           </TabsContent>
-          <TabsContent value="settings" className="mt-0 p-6">
-            <SettingsTab />
-          </TabsContent>
+          {showVapi && (
+            <TabsContent value="settings" className="mt-0 p-6">
+              <SettingsTab />
+            </TabsContent>
+          )}
         </Tabs>
       </main>
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500" />
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   );
 }
